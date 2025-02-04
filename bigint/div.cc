@@ -12,34 +12,29 @@ Number& Number::operator/=(this Number& divisible, View divisor) {
     Number res{};
 
     while (divisible.size() > 0) {
-        std::optional<View> piece = std::nullopt;
+        std::optional<size_t> offset = std::nullopt;
 
-        for (size_t i = divisible.size() - 1; i-- > 0;) {
-            View p = divisible.view(i);
-            if (p >= divisor) {
-                piece = p;
+        for (size_t i = divisible.size(); i-- > 0;) {
+            if (divisible.view(i) >= divisor) {
+                offset = i;
                 break;
             }
         }
 
-        if (!piece.has_value()) {
+        if (!offset.has_value()) {
             break;
         }
 
-        Number cur{1};
-        Number product{divisor};
-        while (product < *piece) {
-            product += divisor;
+        Digit cur = 0;
+        size_t zeros = 0;
+
+        while (divisible.view(*offset) >= divisor) {
+            zeros = divisible.subWithOffset(divisor, *offset);
             cur += 1;
         }
 
-        if (product != *piece) {
-            product -= divisor;
-            cur -= 1;
-        }
-
-        divisible.subWithOffset(product, divisible.size() - piece->size());
-        res.insert(res.end(), cur.cbegin(), cur.cend());
+        res.push_back(cur);
+        res.resize(res.size() + zeros, 0);
     }
 
     std::reverse(res.begin(), res.end());
@@ -60,6 +55,10 @@ TEST(Div) {
     EXPECT_EQ(c, b);
 
     EXPECT_EQ(b / b, Number{1});
+
+    Number n200{0, 0, 2};
+    Number n100{0, 0, 1};
+    EXPECT_EQ(n200 / Number{2}, n100);
 }
 }  // namespace
 

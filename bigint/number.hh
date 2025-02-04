@@ -25,9 +25,15 @@ private:
         Digit operator[](this View self, size_t i) noexcept;
         Digit getOr(this View self, size_t i, Digit default_val) noexcept;
 
+        using iterator = const Digit*;
+        using reverse_iterator = std::reverse_iterator<const Digit*>;
         using const_iterator = const Digit*;
         using const_reverse_iterator = std::reverse_iterator<const Digit*>;
 
+        iterator begin(this View self) noexcept;
+        iterator end(this View self) noexcept;
+        reverse_iterator rbegin(this View self) noexcept;
+        reverse_iterator rend(this View self) noexcept;
         const_iterator cbegin(this View self) noexcept;
         const_iterator cend(this View self) noexcept;
         const_reverse_iterator crbegin(this View self) noexcept;
@@ -65,8 +71,10 @@ private:
     Digit getOr(this const Number& self, size_t i, Digit default_val) noexcept;
     Digit div10(this Number& self);
 
-    Number& addWithOffset(this Number& lhs, View rhs, size_t offset);
-    Number& subWithOffset(this Number& lhs, View rhs, size_t offset);
+    void addWithOffset(this Number& lhs, View rhs, size_t offset);
+
+    /// Returns the amount of leading zeros after subtraction
+    size_t subWithOffset(this Number& lhs, View rhs, size_t offset);
 
     Number& operator-=(this Number& lhs, View rhs);
     Number& operator-=(this Number& lhs, Digit rhs);

@@ -85,21 +85,21 @@ Number::Digit Number::getOr(this const Number& self, size_t i, Number::Digit def
     return self.view().getOr(i, default_val);
 }
 
-// Number::View::iterator Number::View::begin(this View self) noexcept {
-//     return self.m_data;
-// }
+Number::View::iterator Number::View::begin(this View self) noexcept {
+    return self.m_data;
+}
 
-// Number::View::iterator Number::View::end(this View self) noexcept {
-//     return self.m_data + self.m_size;
-// }
+Number::View::iterator Number::View::end(this View self) noexcept {
+    return self.m_data + self.m_size;
+}
 
-// Number::View::reverse_iterator Number::View::rbegin(this View self) noexcept {
-//     return reverse_iterator{self.end()};
-// }
+Number::View::reverse_iterator Number::View::rbegin(this View self) noexcept {
+    return reverse_iterator{self.end()};
+}
 
-// Number::View::reverse_iterator Number::View::rend(this View self) noexcept {
-//     return reverse_iterator{self.begin()};
-// }
+Number::View::reverse_iterator Number::View::rend(this View self) noexcept {
+    return reverse_iterator{self.begin()};
+}
 
 Number::View::const_iterator Number::View::cbegin(this View self) noexcept {
     return self.m_data;
@@ -152,7 +152,8 @@ Number& Number::operator+=(this Number& lhs, Digit rhs) {
 }
 
 Number& Number::operator+=(this Number& lhs, View rhs) {
-    return lhs.addWithOffset(rhs, 0);
+    lhs.addWithOffset(rhs, 0);
+    return lhs;
 }
 
 Number& Number::operator+=(this Number& lhs, const Number& rhs) {
@@ -160,9 +161,9 @@ Number& Number::operator+=(this Number& lhs, const Number& rhs) {
     return lhs;
 }
 
-Number& Number::addWithOffset(this Number& lhs, View rhs, size_t offset) {
+void Number::addWithOffset(this Number& lhs, View rhs, size_t offset) {
     if (rhs.size() == 0) {
-        return lhs;
+        return;
     }
 
     Number::Digit carry = 0;
@@ -178,27 +179,22 @@ Number& Number::addWithOffset(this Number& lhs, View rhs, size_t offset) {
     if (carry > 0) {
         lhs.push_back(carry);
     }
-
-    while (lhs.size() > 0 && lhs.back() == 0) {
-        lhs.pop_back();
-    }
-
-    return lhs;
 }
 
 Number& Number::operator-=(this Number& lhs, View rhs) {
-    return lhs.subWithOffset(rhs, 0);
+    lhs.subWithOffset(rhs, 0);
+    return lhs;
 }
 
 Number& Number::operator-=(this Number& lhs, Digit rhs) {
     return lhs -= View{&rhs, 1};
 }
 
-Number& Number::subWithOffset(this Number& lhs, View rhs, size_t offset) {
+size_t Number::subWithOffset(this Number& lhs, View rhs, size_t offset) {
     if (lhs.size() < rhs.size() + offset ||
         lhs.view().cmpWithOffset(rhs, offset) == std::strong_ordering::less) {
         lhs.clear();
-        return lhs;
+        return 0;
     }
 
     bool carry = 0;
@@ -214,11 +210,17 @@ Number& Number::subWithOffset(this Number& lhs, View rhs, size_t offset) {
         }
     }
 
-    while (lhs.size() > 0 && lhs.back() == 0) {
+    while (lhs.size() > offset && lhs.back() == 0) {
         lhs.pop_back();
     }
 
-    return lhs;
+    size_t res = 0;
+    while (lhs.size() > 0 && lhs.back() == 0) {
+        res += 1;
+        lhs.pop_back();
+    }
+
+    return res;
 }
 
 Number::Digit Number::div10(this Number& self) {

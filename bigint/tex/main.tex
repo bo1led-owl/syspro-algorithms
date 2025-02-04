@@ -1,0 +1,44 @@
+\input{preamble}
+
+\date{}
+\author{}
+
+\begin{document}
+\textbf{Ввод:} $n$-значное (делимое) и $m$-значное (делитель) числа.
+
+\textbf{Вывод:} результат деления первого аргумента на второй. \\
+
+Запишем рассматриваемый алгоритм в псевдокоде:
+\begin{lstlisting}[language=Python]
+def div(divisible: Number, divisor: Number) -> Number:
+    if divisor == 0:
+        throw DivisionByZeroException()
+    
+    res = []
+    while len(divisible) > 0:
+        offset = None
+        for i in [1, len(divisible)]:
+            if divisible[:i] >= divisor:
+                offset = i
+                break
+
+        if offset is None:
+            break
+
+        cur = 0
+        while divisible[:offset] > divisor:
+            divisible[:offset] -= divisor
+            cur += 1
+
+        res.append(cur)
+    return res
+\end{lstlisting}
+
+В худшем случае внешний цикл совершит $n$ итераций, первый вложенный "--- $m$, второй вложенный "--- $B$, где $B$ "--- основание системы счисления, константа.
+На каждой итерации внутренних циклов совершаются только элементарные операции.
+
+Значит в худшем случае $T(n, m) = n(m + B)$.
+$T(n, m) = O(n \cdot m)$, так как $nm > nB$ при $n, m \to \infty$
+
+В лучшем же случае оба аргумента равны, тогда внешний цикл совершит ровно одну итерацию, первый вложенный "--- $n$, второй вложенный "--- тоже ровно одну. Тогда получаем $T(n, m) = T(n, n) = O(n)$.
+\end{document}
