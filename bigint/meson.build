@@ -14,14 +14,12 @@ mul = executable(
   'multiplication',
   src,
   dependencies: [gtest_dep],
-  cpp_args: ['-DMUL'],
 )
 
 div = executable(
   'division',
   src,
   dependencies: [gtest_dep],
-  cpp_args: ['-DDIV'],
 )
 
 test('multiplication', mul)
