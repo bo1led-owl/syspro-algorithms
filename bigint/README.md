@@ -1,11 +1,9 @@
 Setup the build system:
 ```
-meson setup <BUILDDIR> --buildmode=release
+meson setup <BUILDDIR> --buildtype=release
 ```
 
-Build:
+Run tests:
 ```
-meson compile -C <BUILDDIR>
+meson test -C <BUILDDIR>
 ```
-
-This will produce two executables: `<BUILDDIR>/multiplication` and `<BUILDDIR>/division`

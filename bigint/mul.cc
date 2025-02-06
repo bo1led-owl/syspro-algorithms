@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include "number.hh"
 
 namespace {
@@ -55,11 +57,7 @@ Number Number::View::mulKaratsuba(this View lhs, View rhs) {
     return bd;
 }
 
-#ifdef MUL
-#include <testing.hh>
-
-namespace {
-TEST(Naive) {
+TEST(Mul, Naive) {
     Number a{485'062'007};
     a = a.mulNaive(Number{132'375'408});
 
@@ -83,17 +81,10 @@ Number fibonacci(size_t n) {
     return b;
 }
 
-TEST(Karatsuba) {
+TEST(Mul, Karatsuba) {
     // these numbers definitely have different length
     Number a{fibonacci(10'000)};
     Number b{fibonacci(5'000)};
 
     EXPECT_EQ(a.mulNaive(b), a.mulKaratsuba(b));
 }
-}  // namespace
-
-int main() {
-    RUN_TEST(Naive);
-    RUN_TEST(Karatsuba);
-}
-#endif

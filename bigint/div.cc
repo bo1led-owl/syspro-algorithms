@@ -1,3 +1,5 @@
+#include <gtest/gtest.h>
+
 #include <algorithm>
 #include <optional>
 #include <stdexcept>
@@ -42,11 +44,7 @@ Number& Number::operator/=(this Number& divisible, View divisor) {
     return divisible;
 }
 
-#ifdef DIV
-#include "testing.hh"
-
-namespace {
-TEST(Div) {
+TEST(Div, Div) {
     Number a{123'456, 78};
     Number b{35'456, 85};
 
@@ -60,9 +58,3 @@ TEST(Div) {
     Number n100{0, 0, 1};
     EXPECT_EQ(n200 / Number{2}, n100);
 }
-}  // namespace
-
-int main() {
-    RUN_TEST(Div);
-}
-#endif

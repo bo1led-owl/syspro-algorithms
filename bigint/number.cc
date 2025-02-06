@@ -85,36 +85,36 @@ Number::Digit Number::getOr(this const Number& self, size_t i, Number::Digit def
     return self.view().getOr(i, default_val);
 }
 
-Number::View::iterator Number::View::begin(this View self) noexcept {
-    return self.m_data;
+Number::View::iterator Number::View::begin() noexcept {
+    return m_data;
 }
 
-Number::View::iterator Number::View::end(this View self) noexcept {
-    return self.m_data + self.m_size;
+Number::View::iterator Number::View::end() noexcept {
+    return m_data + m_size;
 }
 
-Number::View::reverse_iterator Number::View::rbegin(this View self) noexcept {
-    return reverse_iterator{self.end()};
+Number::View::reverse_iterator Number::View::rbegin() noexcept {
+    return reverse_iterator{end()};
 }
 
-Number::View::reverse_iterator Number::View::rend(this View self) noexcept {
-    return reverse_iterator{self.begin()};
+Number::View::reverse_iterator Number::View::rend() noexcept {
+    return reverse_iterator{begin()};
 }
 
-Number::View::const_iterator Number::View::cbegin(this View self) noexcept {
-    return self.m_data;
+Number::View::const_iterator Number::View::cbegin() const noexcept {
+    return m_data;
 }
 
-Number::View::const_iterator Number::View::cend(this View self) noexcept {
-    return self.m_data + self.m_size;
+Number::View::const_iterator Number::View::cend() const noexcept {
+    return m_data + m_size;
 }
 
-Number::View::const_reverse_iterator Number::View::crbegin(this View self) noexcept {
-    return const_reverse_iterator{self.cend()};
+Number::View::const_reverse_iterator Number::View::crbegin() const noexcept {
+    return const_reverse_iterator{cend()};
 }
 
-Number::View::const_reverse_iterator Number::View::crend(this View self) noexcept {
-    return const_reverse_iterator{self.cbegin()};
+Number::View::const_reverse_iterator Number::View::crend() const noexcept {
+    return const_reverse_iterator{cbegin()};
 }
 
 Number::View Number::view(this const Number& self) noexcept {

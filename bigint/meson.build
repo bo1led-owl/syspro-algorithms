@@ -7,16 +7,22 @@ project(
   ],
 )
 
-src = ['number.cc', 'mul.cc', 'div.cc']
+src = files('number.cc', 'mul.cc', 'div.cc')
+gtest_dep = dependency('gtest_main')
 
-executable(
+mul = executable(
   'multiplication',
   src,
+  dependencies: [gtest_dep],
   cpp_args: ['-DMUL'],
 )
 
-executable(
+div = executable(
   'division',
   src,
+  dependencies: [gtest_dep],
   cpp_args: ['-DDIV'],
 )
+
+test('multiplication', mul)
+test('division', div)

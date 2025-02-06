@@ -30,14 +30,14 @@ private:
         using const_iterator = const Digit*;
         using const_reverse_iterator = std::reverse_iterator<const Digit*>;
 
-        iterator begin(this View self) noexcept;
-        iterator end(this View self) noexcept;
-        reverse_iterator rbegin(this View self) noexcept;
-        reverse_iterator rend(this View self) noexcept;
-        const_iterator cbegin(this View self) noexcept;
-        const_iterator cend(this View self) noexcept;
-        const_reverse_iterator crbegin(this View self) noexcept;
-        const_reverse_iterator crend(this View self) noexcept;
+        iterator begin() noexcept;
+        iterator end() noexcept;
+        reverse_iterator rbegin() noexcept;
+        reverse_iterator rend() noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+        const_reverse_iterator crbegin() const noexcept;
+        const_reverse_iterator crend() const noexcept;
 
         Number operator+(this View lhs, View rhs);
         Number operator/(this View lhs, View rhs);
