@@ -15,6 +15,23 @@ size_t roundUpToPowerOf2(size_t n) {
 
     return n;
 }
+
+Number fibonacci(size_t n) {
+    if (n == 0) {
+        return Number{0};
+    } else if (n <= 2) {
+        return Number{1};
+    }
+
+    Number a{1}, b{1};
+
+    for (size_t i = 3; i <= n; ++i) {
+        a += b;
+        std::swap(a, b);
+    }
+
+    return b;
+}
 }  // namespace
 
 Number Number::View::mulKaratsuba(this View lhs, View rhs) {
@@ -62,23 +79,6 @@ TEST(Mul, Naive) {
     a = a.mulNaive(Number{132'375'408});
 
     EXPECT_EQ(a, Number({315'681'040, 14'950'121}));
-}
-
-Number fibonacci(size_t n) {
-    if (n == 0) {
-        return Number{0};
-    } else if (n <= 2) {
-        return Number{1};
-    }
-
-    Number a{1}, b{1};
-
-    for (size_t i = 3; i <= n; ++i) {
-        a += b;
-        std::swap(a, b);
-    }
-
-    return b;
 }
 
 TEST(Mul, Karatsuba) {
