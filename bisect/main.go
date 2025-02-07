@@ -47,13 +47,8 @@ func getHashes(from string, to string) ([]string, error) {
 	return hashes, nil
 }
 
-func checkoutToCommit(hash string) error {
-	_, err := exec.Command("git", "checkout", hash).Output()
-	return err
-}
-
-func checkoutToBranch(branch string) error {
-	_, err := exec.Command("git", "checkout", branch).Output()
+func checkout(dest string) error {
+	_, err := exec.Command("git", "checkout", dest).Output()
 	return err
 }
 
@@ -100,7 +95,7 @@ func main() {
 
 		curHash := hashes[m]
 
-		err = checkoutToCommit(curHash)
+		err = checkout(curHash)
 		if err != nil {
 			printErrAndExit(1, "Failed to checkout: %s", err.Error())
 		}
@@ -114,7 +109,7 @@ func main() {
 	}
 
 	fmt.Println(hashes[l])
-	err = checkoutToBranch(curBranch)
+	err = checkout(curBranch)
 	if err != nil {
 		printErrAndExit(1, "Failed to checkout: %s", err.Error())
 	}
