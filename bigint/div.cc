@@ -6,18 +6,18 @@
 
 #include "number.hh"
 
-Number& Number::operator/=(this Number& divisible, View divisor) {
+Number& Number::operator/=(this Number& dividend, View divisor) {
     if (divisor.size() == 0) {
         throw std::invalid_argument{"Division by zero"};
     }
 
     Number res{};
 
-    while (divisible.size() > 0) {
+    while (dividend.size() > 0) {
         std::optional<size_t> offset = std::nullopt;
 
-        for (size_t i = divisible.size(); i-- > 0;) {
-            if (divisible.view(i) >= divisor) {
+        for (size_t i = dividend.size(); i-- > 0;) {
+            if (dividend.view(i) >= divisor) {
                 offset = i;
                 break;
             }
@@ -30,8 +30,8 @@ Number& Number::operator/=(this Number& divisible, View divisor) {
         Digit cur = 0;
         size_t zeros = 0;
 
-        while (divisible.view(*offset) >= divisor) {
-            zeros = divisible.subWithOffset(divisor, *offset);
+        while (dividend.view(*offset) >= divisor) {
+            zeros = dividend.subWithOffset(divisor, *offset);
             cur += 1;
         }
 
@@ -40,8 +40,8 @@ Number& Number::operator/=(this Number& divisible, View divisor) {
     }
 
     std::reverse(res.begin(), res.end());
-    std::swap(divisible, res);
-    return divisible;
+    std::swap(dividend, res);
+    return dividend;
 }
 
 TEST(Div, Div) {
