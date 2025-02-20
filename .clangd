@@ -4,7 +4,7 @@ CompileOptions:
 If:
 	PathMatch: .*\.c
 CompileOptions:
-	Add: [-xc, -std=c99]
+	Add: [-xc, -std=c11]
 
 If:
 	PathMatch: .*\.h
