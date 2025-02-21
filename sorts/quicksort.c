@@ -77,8 +77,7 @@ static void quickSort(int* a, size_t l, size_t r) {
 #elif defined(LOMUTO)
     PartitionResult pivots = lomutoPartition(a, l, r);
 
-    if (pivots.l > 0)
-        quickSort(a, l, pivots.l - 1);
+    if (pivots.l > 0) quickSort(a, l, pivots.l - 1);
     quickSort(a, pivots.h, r);
 #else
 #error No partition algorithm chosen

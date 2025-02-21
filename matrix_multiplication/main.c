@@ -116,7 +116,7 @@ static void measure(FILE* f, const char* name, MulFn mul, size_t n) {
     freeCtx(c);
 }
 
-int main() {
+int main(void) {
     srand(time(NULL));
 
     FILE* outfile = fopen("result.dat", "w");

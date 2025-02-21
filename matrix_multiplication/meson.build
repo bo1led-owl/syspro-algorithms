@@ -2,7 +2,7 @@ project(
   'algorithms-matrix-multiplication',
   ['c', 'cpp'],
   default_options: [
-    'c_std=c23',
+    'c_std=c11',
     'cpp_std=c++23',
     'warning_level=3',
   ],
