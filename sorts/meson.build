@@ -23,3 +23,8 @@ executable(
   c_args: '-march=native',
   dependencies: [m_dep],
 )
+
+order_stat = executable(
+  'order_stat',
+  'order_stat.c',
+)

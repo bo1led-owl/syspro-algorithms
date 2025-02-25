@@ -65,7 +65,16 @@ static size_t countLocalInversions(Slice a) {
     return res;
 }
 
-bool isIdealPermutation(int* nums, int numsSize) {
+bool isIdealPermutationComplex(int* nums, int numsSize) {
     Slice s = make(nums, nums + numsSize);
     return countLocalInversions(s) == countGlobalInversions(s);
+}
+
+bool isIdealPermutation(int* nums, int n) {
+    int m = nums[0];
+    for (int i = 2; i < n; ++i) {
+        if (i > 1) m = (m >= nums[i - 2]) ? m : nums[i - 2];
+        if (nums[i] < m) return false;
+    }
+    return true;
 }

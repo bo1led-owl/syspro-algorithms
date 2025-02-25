@@ -67,7 +67,7 @@ class Solution {
 public:
     void wiggleSort(std::vector<int>& nums) {
         std::vector<int> copy{nums};
-        quickSort(copy);
+        shellSort(copy);
 
         size_t m = (nums.size() - 1) / 2;
         size_t r = nums.size() - 1;

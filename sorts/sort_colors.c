@@ -13,7 +13,7 @@ void sortColors(int* nums, size_t numsSize) {
     size_t twos = numsSize - 1;
 
     size_t i = 0;
-    while (i < twos) {
+    while (i < numsSize) {
         if (nums[i] == 0 && i > zeros) {
             swap(nums, i, zeros++);
         } else if (nums[i] == 2 && i < twos) {

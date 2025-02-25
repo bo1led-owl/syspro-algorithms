@@ -61,7 +61,7 @@ def formatBenchmarkTable(
 
 
 if __name__ == "__main__":
-    algorithms = ["Hoare", "Lomuto naive", "Lomuto branch-free"]
+    algorithms = ["Hoare", "Lomuto", "Lomuto branch-free"]
     with open("result.dat", "r", encoding="utf-8") as f:
         sizes = []
         data = []

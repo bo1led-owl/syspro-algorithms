@@ -6,6 +6,6 @@ AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortEnumsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: Always
-AllowShortLoopsOnASingleLine: false
+AllowShortLoopsOnASingleLine: true
 DerivePointerAlignment: false
 PointerAlignment: Left
