@@ -32,7 +32,7 @@ func getHashes(from string, to string) ([]string, error) {
 	}
 
 	end := -1
-	for i := 0; i < len(hashes); i++ {
+	for i := range hashes {
 		if hashes[i] == to {
 			end = i + 1
 			break
