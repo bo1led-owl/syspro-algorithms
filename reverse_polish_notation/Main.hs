@@ -26,4 +26,4 @@ main = do
         Left err -> outputStrLn $ show err
         Right tree ->
           let polish = toRevPolish tree
-           in outputStrLn ("(" ++ (unwords . map show) polish ++ ") = " ++ show (eval polish))
+           in outputStrLn (" (" ++ (unwords . map show) polish ++ ") = " ++ show (eval polish))
