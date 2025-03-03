@@ -21,8 +21,8 @@ op :: Parser Item
 op =
   choice
     [ try (string "**") $> Operator Pow,
-      try (string ">>") $> Operator LShift,
-      try (string "<<") $> Operator RShift,
+      try (string "<<") $> Operator LShift,
+      try (string ">>") $> Operator RShift,
       try (string "&&") $> Operator And,
       try (string "||") $> Operator Or,
       try (string "==") $> Operator Eq,

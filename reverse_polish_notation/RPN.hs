@@ -16,6 +16,9 @@ isLeftAssociative :: Op -> Bool
 isLeftAssociative Pow = False
 isLeftAssociative _ = True
 
+isRightAssociative :: Op -> Bool
+isRightAssociative = not . isLeftAssociative
+
 data Op
   = Pow
   | Mul
@@ -36,7 +39,12 @@ data Op
   | BitOr
   | And
   | Or
-  deriving (Eq)
+
+instance Eq Op where
+  l == r = precedence l == precedence r
+
+instance Ord Op where
+  l <= r = precedence l <= precedence r
 
 instance Show Op where
   show Pow = "**"
@@ -109,9 +117,8 @@ toRevPolish' s ((Item (Operator op)) : ts) =
   case pop s of
     Nothing -> toRevPolish' (push s op) ts
     Just (topOp, s') ->
-      if precedence topOp >= precedence op && isLeftAssociative op
-        then Item (Operator topOp) : toRevPolish' (push s' op) ts
-        else toRevPolish' (push s op) ts
+      let (h, t) = span (\x -> x >= op || (x == op && isLeftAssociative op)) s
+       in map (Item . Operator) h ++ toRevPolish' (push t op) ts
 
 toLinear :: [Tree] -> [Item]
 toLinear ((Item x) : xs) = x : toLinear xs
@@ -150,7 +157,7 @@ evalOp op l r = case op of
 eval' :: Stack Int -> [Item] -> Stack Int
 eval' s [] = s
 eval' s ((Operand n) : xs) = eval' (push s n) xs
-eval' (l : r : s) ((Operator op) : xs) = eval' (push s (evalOp op l r)) xs
+eval' (r : l : s) ((Operator op) : xs) = eval' (push s (evalOp op l r)) xs
 eval' _ _ = error "invalid stack state, parser did something wrong"
 
 eval :: [Item] -> Int
