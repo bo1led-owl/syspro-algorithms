@@ -13,11 +13,10 @@ typedef struct {
 
 #define len(s) ((s).end - (s).begin)
 
-#define print(s)                                       \
-    {                                                  \
-        for (int* _p = (s).begin; _p != (s).end; ++_p) \
-            printf("%d ", *_p);                        \
-        putchar('\n');                                 \
+#define print(s)                                                           \
+    {                                                                      \
+        for (int* _p = (s).begin; _p != (s).end; ++_p) printf("%d ", *_p); \
+        putchar('\n');                                                     \
     }
 
 static void swap(int* a, int* b) {
@@ -44,7 +43,9 @@ static void merge(const Slice l, const Slice r, int* buf) {
 static void inPlaceMergeSort(Slice a);
 
 static void inPlaceMergeSortInternal(Slice a, int* buf) {
-    if (len(a) == 0) return;
+    if (len(a) == 0) {
+        return;
+    }
     if (len(a) == 1) {
         swap(buf, a.begin);
         return;

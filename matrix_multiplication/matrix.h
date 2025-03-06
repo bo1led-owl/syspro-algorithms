@@ -3,7 +3,7 @@
 #include <stddef.h>
 
 typedef int MatT;
-typedef void(*MulFn)(size_t, MatT*, MatT*, MatT*);
+typedef void (*MulFn)(size_t, MatT*, MatT*, MatT*);
 
 #ifdef __cplusplus
 extern "C" {

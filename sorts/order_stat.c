@@ -51,8 +51,9 @@ static int kthOrderStat(int* data, size_t n, size_t k) {
 }
 
 static int median(int* data, size_t n) {
-    if (n % 2 != 0) return kthOrderStat(data, n, n / 2);
-    else {
+    if (n % 2 != 0) {
+        return kthOrderStat(data, n, n / 2);
+    } else {
         int a = kthOrderStat(data, n, n / 2 - 1);
         int b = kthOrderStat(data, n, n / 2);
         return (a + b) / 2;
@@ -68,8 +69,12 @@ static void check(int* data, size_t n) {
 
     int min = data[0], max = data[0];
     for (size_t i = 0; i < n; ++i) {
-        if (data[i] < min) min = data[i];
-        if (data[i] > max) max = data[i];
+        if (data[i] < min) {
+            min = data[i];
+        }
+        if (data[i] > max) {
+            max = data[i];
+        }
     }
 
     long long bestsum = LLONG_MAX;

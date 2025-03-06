@@ -8,7 +8,9 @@ struct ListNode {
 };
 
 struct ListNode* detectCycle(struct ListNode* head) {
-    if (head == NULL) return NULL;
+    if (head == NULL) {
+        return NULL;
+    }
 
     // Brent's algorithm
 
@@ -17,7 +19,9 @@ struct ListNode* detectCycle(struct ListNode* head) {
     struct ListNode* tortoise = head;
     struct ListNode* hare = head->next;
     while (tortoise != hare) {
-        if (tortoise == NULL || hare == NULL) return NULL;
+        if (tortoise == NULL || hare == NULL) {
+            return NULL;
+        }
 
         if (power == lambda) {
             tortoise = hare;

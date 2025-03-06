@@ -39,7 +39,9 @@ static size_t mergeAndCountSplitInv(Slice a, Slice b, int* buf) {
 }
 
 static size_t countGlobalInversions(Slice a) {
-    if (len(a) <= 1) return 0;
+    if (len(a) <= 1) {
+        return 0;
+    }
 
     int* mid = a.begin + len(a) / 2;
     Slice left = make(a.begin, mid);
@@ -73,8 +75,12 @@ bool isIdealPermutationComplex(int* nums, int numsSize) {
 bool isIdealPermutation(int* nums, int n) {
     int m = nums[0];
     for (int i = 2; i < n; ++i) {
-        if (i > 1) m = (m >= nums[i - 2]) ? m : nums[i - 2];
-        if (nums[i] < m) return false;
+        if (i > 1) {
+            m = (m >= nums[i - 2]) ? m : nums[i - 2];
+        }
+        if (nums[i] < m) {
+            return false;
+        }
     }
     return true;
 }

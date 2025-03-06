@@ -8,7 +8,7 @@ class MinStack {
 
 public:
     MinStack() = default;
-    
+
     void push(int val) {
         repr_.push(val);
         int x = (mins_.empty() || val < mins_.top()) ? val : mins_.top();

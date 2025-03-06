@@ -35,7 +35,9 @@ static struct ListNode* reverseN(struct ListNode* head, int n) {
 }
 
 struct ListNode* reverseBetween(struct ListNode* head, int left, int right) {
-    if (left == 1) return reverseN(head, right - left + 1);
+    if (left == 1) {
+        return reverseN(head, right - left + 1);
+    }
 
     struct ListNode* revstart = head;
     for (int i = 1; i < left - 1; ++i) {

@@ -40,9 +40,13 @@ static PartitionResult lomutoPartition(int* a, size_t low, size_t high) {
 }
 
 static size_t lomutoPartitionBranchFree(int* a, size_t first, size_t last) {
-    if (last - first < 2) return first;
+    if (last - first < 2) {
+        return first;
+    }
     --last;
-    if (a[first] > a[last]) swap(a, first, last);
+    if (a[first] > a[last]) {
+        swap(a, first, last);
+    }
     size_t pivot_pos = first;
     int pivot = a[first];
     do {
@@ -102,7 +106,9 @@ static void quickSortLomuto(int* a, size_t l, size_t r) {
     }
 
     PartitionResult pivots = lomutoPartition(a, l, r);
-    if (pivots.l > 0) quickSortLomuto(a, l, pivots.l - 1);
+    if (pivots.l > 0) {
+        quickSortLomuto(a, l, pivots.l - 1);
+    }
     quickSortLomuto(a, pivots.h, r);
 }
 

@@ -47,7 +47,9 @@ static void push(PriorityQueue* pq, ListNode* x) {
 }
 
 static ListNode* pop(PriorityQueue* pq) {
-    if (pq->len == 0) return NULL;
+    if (pq->len == 0) {
+        return NULL;
+    }
 
     ListNode* res = pq->items[0];
 
@@ -64,10 +66,14 @@ static ListNode* pop(PriorityQueue* pq) {
             int l = get(pq, lchild);
             int r = get(pq, rchild);
 
-            if (get(pq, cur) < l && get(pq, cur) < r) break;
+            if (get(pq, cur) < l && get(pq, cur) < r) {
+                break;
+            }
             child = (l <= r) ? lchild : rchild;
         } else {
-            if (get(pq, cur) < get(pq, lchild)) break;
+            if (get(pq, cur) < get(pq, lchild)) {
+                break;
+            }
             child = lchild;
         }
 
@@ -106,7 +112,9 @@ ListNode* mergeKLists(ListNode** lists, size_t listsSize) {
 }
 
 static ListNode* makeList(int* a, size_t n) {
-    if (n == 0) return NULL;
+    if (n == 0) {
+        return NULL;
+    }
 
     ListNode* head = malloc(sizeof(ListNode));
     head->val = *a;

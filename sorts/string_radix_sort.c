@@ -37,7 +37,9 @@ static void sortStrings(char** strs, char** scratch, size_t n, size_t elem_len) 
         swapPtrs((void**)strs, (void**)scratch);
     }
 
-    if (elem_len % 2 != 0) memcpy(strs, scratch, sizeof(char*) * n);
+    if (elem_len % 2 != 0) {
+        memcpy(strs, scratch, sizeof(char*) * n);
+    }
 }
 
 #define SZ 13
