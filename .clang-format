@@ -9,3 +9,4 @@ AllowShortIfStatementsOnASingleLine: Always
 AllowShortLoopsOnASingleLine: true
 DerivePointerAlignment: false
 PointerAlignment: Left
+InsertBraces: true

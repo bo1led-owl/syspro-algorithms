@@ -1,4 +1,5 @@
 .cache
+classroom/
 */build/
 */dist-newstyle/
 *.aux
