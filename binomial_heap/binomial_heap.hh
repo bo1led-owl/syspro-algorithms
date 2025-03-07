@@ -23,7 +23,6 @@ class BinomialHeap {
     };
 
     class Iterator final {
-    protected:
         friend BinomialHeap;
 
         std::shared_ptr<Node> node;
@@ -201,10 +200,16 @@ public:
     iterator begin() noexcept {
         return iterator{root_};
     }
+    const_iterator begin() const noexcept {
+        return iterator{root_};
+    }
     const_iterator cbegin() const noexcept {
         return const_iterator{root_};
     }
     iterator end() noexcept {
+        return iterator{nullptr};
+    }
+    const_iterator end() const noexcept {
         return iterator{nullptr};
     }
     const_iterator cend() const noexcept {

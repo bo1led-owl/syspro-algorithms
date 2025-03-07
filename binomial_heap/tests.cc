@@ -2,6 +2,7 @@
 
 #include "binomial_heap.hh"
 
+namespace {
 TEST(BinomialHeap, Basic) {
     BinomialHeap<int> a;
 
@@ -74,3 +75,31 @@ TEST(BinomialHeap, ComplexType) {
     a.erase(iters[6]);
     EXPECT_EQ(**a.top(), 4);
 }
+
+void foo(const BinomialHeap<int>& heap) {
+    constexpr int SIZE = 15;
+    int check[SIZE];
+    std::fill_n(check, SIZE, 0);
+
+    for (int x : heap) {
+        std::cout << x << '\n';
+        check[x] += 1;
+    }
+
+    for (int i = 0; i < SIZE; ++i) {
+        EXPECT_EQ(check[i], 1);
+    }
+}
+
+TEST(BinomialHeap, ConstRef) {
+    BinomialHeap<int> a;
+
+    constexpr int SIZE = 15;
+
+    for (int i = 0; i < SIZE; ++i) {
+        a.insert(i);
+    }
+
+    foo(a);
+}
+}  // namespace
