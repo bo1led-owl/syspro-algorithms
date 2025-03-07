@@ -16,7 +16,6 @@ TEST(BinomialHeap, Basic) {
     std::fill_n(check, SIZE, 0);
 
     for (auto x : a) {
-        std::cout << x << '\n';
         check[x] += 1;
     }
 
@@ -56,8 +55,7 @@ TEST(BinomialHeap, DecreaseKey) {
 }
 
 TEST(BinomialHeap, ComplexType) {
-    auto lt = [](const std::unique_ptr<int>& a, const std::unique_ptr<int>& b) { return *a < *b; };
-
+    auto lt = [](const auto& a, const auto& b) { return *a < *b; };
     BinomialHeap<std::unique_ptr<int>, decltype(lt)> a{lt};
 
     constexpr int SIZE = 15;
@@ -82,7 +80,6 @@ void foo(const BinomialHeap<int>& heap) {
     std::fill_n(check, SIZE, 0);
 
     for (int x : heap) {
-        std::cout << x << '\n';
         check[x] += 1;
     }
 
