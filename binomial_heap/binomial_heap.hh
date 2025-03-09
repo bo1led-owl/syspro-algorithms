@@ -4,22 +4,35 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <utility>
 
 template <typename T, typename Cmp = std::less<T>>
     requires(std::invocable<Cmp, const T&, const T&>)
 class BinomialHeap {
+protected:
+    using Deg = unsigned;
+    static constexpr Deg MAX_DEG = std::numeric_limits<Deg>::max();
+
     struct Node final {
         std::shared_ptr<Node> leftmost_child = nullptr;
         std::shared_ptr<Node> parent = nullptr;
         std::shared_ptr<Node> neighbour = nullptr;
-        unsigned deg = 0;
+        Deg deg = 0;
         T value;
 
-        Node() = default;
+        std::shared_ptr<Node> clone(std::shared_ptr<Node> new_parent) {
+            return std::make_shared<Node>(leftmost_child.clone(), new_parent, neighbour.clone(),
+                                          deg, value);
+        }
 
-        template <typename S>
-            requires(std::constructible_from<T, S>)
-        Node(S&& val) : value{std::forward<S>(val)} {}
+        Node() = default;
+        Node(std::shared_ptr<Node> child, std::shared_ptr<Node> parent,
+             std::shared_ptr<Node> neighbour, unsigned deg, const T& value)
+            : leftmost_child{child}, parent{parent}, neighbour{neighbour}, deg{deg}, value{value} {}
+
+        template <typename... Args>
+            requires(std::constructible_from<T, Args...>)
+        Node(Args&&... args) : value{std::forward<Args>(args)...} {}
     };
 
     class Iterator final {
@@ -27,7 +40,7 @@ class BinomialHeap {
 
         std::shared_ptr<Node> node;
 
-        explicit Iterator(std::shared_ptr<Node> node) noexcept : node{node} {}
+        explicit Iterator(std::shared_ptr<Node> node) : node{node} {}
 
     public:
         using difference_type = ptrdiff_t;
@@ -40,6 +53,10 @@ class BinomialHeap {
 
         reference operator*() const noexcept {
             return node->value;
+        };
+
+        pointer operator->() const noexcept {
+            return std::addressof(node->value);
         };
 
         Iterator& operator++() noexcept {
@@ -92,23 +109,34 @@ public:
     using iterator = Iterator;
     using const_iterator = Iterator;
 
-private:
-    std::shared_ptr<Node> merge(std::shared_ptr<Node> lhs, std::shared_ptr<Node> rhs) noexcept {
+protected:
+    iterator makeIterator(std::shared_ptr<Node> n) {
+        return iterator{n};
+    }
+
+    std::shared_ptr<Node> nodeFromIter(iterator it) {
+        return it.node;
+    }
+
+    std::shared_ptr<Node> merge(std::shared_ptr<Node> lhs, std::shared_ptr<Node> rhs) {
         assert(lhs->deg == rhs->deg);
 
         if (!comp_(lhs->value, rhs->value)) {
             std::swap(lhs, rhs);
         }
 
+        assert(!lhs->neighbour);
+
+        rhs->parent = lhs;
         rhs->neighbour = lhs->leftmost_child;
         lhs->leftmost_child = rhs;
         lhs->deg += 1;
         return lhs;
     }
 
-    iterator merge(std::shared_ptr<Node> node) noexcept {
+    iterator merge(std::shared_ptr<Node> node) {
         if (!node) {
-            return iterator{nullptr};
+            return end();
         }
 
         if (!root_) {
@@ -116,33 +144,92 @@ private:
             return iterator{root_};
         }
 
-        std::shared_ptr<Node> cur = root_;
-        std::shared_ptr<Node> prev = nullptr;
-        while (cur) {
-            if (node->deg <= cur->deg) {
-                if (prev) {
-                    prev->neighbour = node;
-                } else {
-                    root_ = node;
-                }
-                node->neighbour = cur;
-                return iterator{node};
-            } else if (cur->deg == node->deg) {
-                if (prev) {
-                    prev->neighbour = cur->neighbour;
-                }
-                node = merge(cur, node);
+        std::shared_ptr<Node> result = nullptr;
+        std::shared_ptr<Node> res_end = nullptr;
+
+        std::shared_ptr<Node> carry = nullptr;
+        std::shared_ptr<Node> i = root_;
+        std::shared_ptr<Node> j = node;
+
+        auto get_deg = [](const Node* p) { return p ? p->deg : MAX_DEG; };
+        auto append = [&result, &res_end](std::shared_ptr<Node> n) {
+            assert(!n->neighbour);
+
+            if (!result) {
+                result = res_end = n;
             } else {
-                prev = cur;
-                cur = cur->neighbour;
+                res_end->neighbour = n;
+                res_end = n;
+            }
+        };
+
+        while (i || j || carry) {
+            Deg min_deg = std::min({get_deg(i.get()), get_deg(j.get()), get_deg(carry.get())});
+            bool t1 = i && i->deg == min_deg;
+            bool t2 = j && j->deg == min_deg;
+            bool tc = carry && carry->deg == min_deg;
+
+            if (t1 && t2 && tc) {
+                append(carry);
+                std::shared_ptr<Node> tmp1 = i->neighbour;
+                std::shared_ptr<Node> tmp2 = j->neighbour;
+                i->neighbour = nullptr;
+                j->neighbour = nullptr;
+                carry = merge(i, j);
+                i = tmp1;
+                j = tmp2;
+            } else if (t1 && t2) {
+                std::shared_ptr<Node> tmp1 = i->neighbour;
+                std::shared_ptr<Node> tmp2 = j->neighbour;
+                i->neighbour = nullptr;
+                j->neighbour = nullptr;
+                carry = merge(i, j);
+                i = tmp1;
+                j = tmp2;
+            } else if (t1 && tc) {
+                std::shared_ptr<Node> tmp = i->neighbour;
+                i->neighbour = nullptr;
+                carry = merge(i, carry);
+                i = tmp;
+            } else if (t2 && tc) {
+                std::shared_ptr<Node> tmp = j->neighbour;
+                j->neighbour = nullptr;
+                carry = merge(j, carry);
+                j = tmp;
+            } else if (t1) {
+                std::shared_ptr<Node> tmp = i->neighbour;
+                i->neighbour = nullptr;
+                append(i);
+                i = tmp;
+            } else if (t2) {
+                std::shared_ptr<Node> tmp = j->neighbour;
+                j->neighbour = nullptr;
+                append(j);
+                j = tmp;
+            } else if (tc) {
+                append(carry);
+                carry = nullptr;
             }
         }
 
-        prev->neighbour = node;
+        root_ = result;
         return iterator{node};
     }
 
-    iterator sieveUp(const_iterator pos) noexcept {
+    static std::shared_ptr<Node> heapifyNeighbourhood(std::shared_ptr<Node> head) {
+        std::shared_ptr<Node> prev = nullptr;
+        std::shared_ptr<Node> next = nullptr;
+        std::shared_ptr<Node> cur = head;
+        while (cur) {
+            cur->parent = nullptr;
+            next = std::exchange(cur->neighbour, prev);
+            prev = std::exchange(cur, next);
+        }
+
+        return prev;
+    }
+
+    iterator sieveUp(const_iterator pos) {
         std::shared_ptr<Node> cur = pos.node;
         while (cur && cur->parent && comp_(cur->value, cur->parent->value)) {
             std::swap(cur->value, cur->parent->value);
@@ -152,7 +239,7 @@ private:
         return iterator{cur};
     }
 
-    std::shared_ptr<Node> extract(const_iterator pos) noexcept {
+    std::shared_ptr<Node> extract(const_iterator pos) {
         assert(pos.node->parent == nullptr);
 
         std::shared_ptr<Node> res = pos.node->leftmost_child;
@@ -170,19 +257,28 @@ private:
         pos.node->parent = nullptr;
         pos.node->neighbour = nullptr;
         pos.node->leftmost_child = nullptr;
-        pos.node->~Node();
+
+        if (res) {
+            res->parent = nullptr;
+        }
         return res;
     }
 
     std::shared_ptr<Node> root_ = nullptr;
     Cmp comp_{};
+    size_type size_ = 0;
 
 public:
     BinomialHeap() = default;
     BinomialHeap(const Cmp& comp) : comp_{comp} {}
 
-    BinomialHeap(BinomialHeap&) = delete;
-    BinomialHeap& operator=(BinomialHeap&) = delete;
+    BinomialHeap(const BinomialHeap& other)
+        : root_{other.root_.clone()}, comp_{other.comp_}, size_{other.size_} {}
+    BinomialHeap& operator=(const BinomialHeap& other) {
+        BinomialHeap heap{other};
+        swap(heap);
+        return *this;
+    }
 
     BinomialHeap(BinomialHeap&& other) noexcept {
         swap(other);
@@ -190,11 +286,26 @@ public:
 
     BinomialHeap& operator=(BinomialHeap&& other) noexcept {
         swap(other);
+        return *this;
     }
 
-    void swap(BinomialHeap& other) noexcept {
+    void merge(BinomialHeap&& other) {
+        merge(other.root_);
+        size_ += other.size_;
+    }
+
+    void swap(BinomialHeap& other) {
         std::swap(root_, other.root_);
         std::swap(comp_, other.comp_);
+        std::swap(size_, other.size_);
+    }
+
+    bool empty() const noexcept {
+        return root_ == nullptr;
+    }
+
+    size_type size() const noexcept {
+        return size_;
     }
 
     iterator begin() noexcept {
@@ -216,7 +327,11 @@ public:
         return const_iterator{nullptr};
     }
 
-    const_iterator top() const noexcept {
+    const_iterator top() const {
+        if (!root_) {
+            return cend();
+        }
+
         std::shared_ptr<Node> cur = root_;
         std::shared_ptr<Node> min = cur;
         while (cur) {
@@ -228,50 +343,82 @@ public:
         return iterator{min};
     }
 
+    void pop() {
+        assert(root_);
+        assert(size_ > 0);
+
+        std::shared_ptr<Node> extracted = extract(top());
+        merge(heapifyNeighbourhood(extracted));
+        size_ -= 1;
+    }
+
     iterator insert(const T& value) {
+        size_ += 1;
         auto node = std::make_shared<Node>(value);
         return merge(node);
     }
 
     iterator insert(T&& value) {
+        size_ += 1;
         auto node = std::make_shared<Node>(std::move(value));
         return merge(node);
     }
 
     iterator insert(const_iterator pos, const T& value) {
-        pos.node->value.~T();
-        std::construct_at(std::addressof(pos.node->value), value);
+        if (pos == cend()) {
+            return insert(value);
+        }
+
+        auto addr = std::addressof(pos.node->value);
+        std::destroy_at(addr);
+        std::construct_at(addr, value);
         return sieveUp(pos);
     }
 
     iterator insert(const_iterator pos, T&& value) {
-        pos.node->value.~T();
-        std::construct_at(std::addressof(pos.node->value), std::move(value));
+        if (pos == cend()) {
+            return insert(std::move(value));
+        }
+
+        auto addr = std::addressof(pos.node->value);
+        std::destroy_at(addr);
+        std::construct_at(addr, std::move(value));
         return sieveUp(pos);
     }
 
     template <typename... Args>
         requires(std::constructible_from<T, Args...>)
     iterator emplace(Args&&... args) {
-        auto node = std::make_shared<Node>(std::forward<Args...>(args...));
+        size_ += 1;
+        auto node = std::make_shared<Node>(std::forward<Args>(args)...);
         return merge(node);
     }
 
     template <typename... Args>
         requires(std::constructible_from<T, Args...>)
-    iterator emplace(const_iterator pos, Args&&... args) {
-        pos.node->value.~T();
-        std::construct_at(std::addressof(pos.node->value), std::forward<Args...>(args...));
+    iterator emplaceHint(const_iterator pos, Args&&... args) {
+        if (pos == end()) {
+            return emplace(std::forward<Args>(args)...);
+        }
+
+        auto addr = std::addressof(pos.node->value);
+        std::destroy_at(addr);
+        std::construct_at(addr, std::forward<Args>(args)...);
         return sieveUp(pos);
     }
 
-    iterator erase(const_iterator pos) noexcept {
+    iterator erase(const_iterator pos) {
+        if (pos == cend()) {
+            return cend();
+        }
+
+        size_ -= 1;
         std::shared_ptr<Node> cur = pos.node;
         while (cur->parent) {
             std::swap(cur->value, cur->parent->value);
             cur = cur->parent;
         }
         std::shared_ptr<Node> extracted = extract(pos);
-        return merge(extracted);
+        return merge(heapifyNeighbourhood(extracted));
     }
 };

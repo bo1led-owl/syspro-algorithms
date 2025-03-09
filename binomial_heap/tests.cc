@@ -65,8 +65,8 @@ TEST(BinomialHeap, ComplexType) {
         iters[i] = a.emplace(new int{42});
     }
 
-    a.emplace(iters[4], new int{4});
-    a.emplace(iters[6], new int{1});
+    a.emplace_hint(iters[4], new int{4});
+    a.emplace_hint(iters[6], new int{1});
 
     EXPECT_EQ(**a.top(), 1);
 
