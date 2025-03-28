@@ -1,5 +1,8 @@
-.cache
+.cache/
 classroom/
+.bsp/
+.scala-build/
+.metals/
 */build/
 */dist-newstyle/
 *.aux

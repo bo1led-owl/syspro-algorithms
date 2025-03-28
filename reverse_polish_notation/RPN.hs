@@ -116,7 +116,7 @@ toRevPolish' s ((Item (Operand n)) : ts) = Item (Operand n) : toRevPolish' s ts
 toRevPolish' s ((Item (Operator op)) : ts) =
   case pop s of
     Nothing -> toRevPolish' (push s op) ts
-    Just (topOp, s') ->
+    Just (topOp, _) ->
       let (h, t) = span (\x -> x >= op || (x == op && isLeftAssociative op)) s
        in map (Item . Operator) h ++ toRevPolish' (push t op) ts
 
