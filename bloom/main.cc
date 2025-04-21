@@ -100,7 +100,7 @@ public:
 }  // namespace
 
 constexpr size_t N = 1000;
-constexpr double EPS = 0.0001;
+constexpr double EPS = 0.002;
 constexpr size_t THREADS = 16;
 constexpr size_t CHUNK = (1z << 32) / THREADS;
 static_assert((1z << 32) % THREADS == 0);
@@ -137,11 +137,8 @@ int main() {
             ++i;
             thrd = std::jthread{[&bf, &addresses, start, end]() {
                 for (size_t i = start; i <= end; ++i) {
-                    if (!std::ranges::binary_search(addresses, i) && bf.lookup(IpAddress(i))) {
-                        // std::lock_guard l{mut};
+                    if (bf.lookup(IpAddress(i)) && !std::ranges::binary_search(addresses, i))
                         falsePositives += 1;
-                        // std::cerr << "false positive on address " << IpAddress(i) << '\n';
-                    }
                 }
             }};
         }
