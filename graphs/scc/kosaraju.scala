@@ -14,7 +14,7 @@ def parseFunctions(lines: IterableOnce[String]): Graph[String] =
 @main def main() =
   val fns = parseFunctions(Source.stdin.getLines())
   println("SCCs:")
-  for scc <- Kosaraju(fns).run do println(s"  ${scc.mkString(", ")}")
+  Kosaraju(fns).run.foreach(scc => println(s"  ${scc.mkString(", ")}"))
 
   var recursiveFunctions = HashSet[String]()
   for fn <- fns.keys do DFS(fns, _ => (), _ => (), recursiveFunctions += _).run(fn)
@@ -26,7 +26,7 @@ class Kosaraju[T](graph: Graph[T], revgraph: Graph[T]):
   def this(g: Graph[T]) = this(g, reverseGraph(g))
   def run: List[List[T]] =
     var timeDfs = DFS[T](revgraph, _ => (), node => { time += (node, maxTime); maxTime += 1 })
-    for v <- revgraph.keys do timeDfs.run(v)
+    revgraph.keys.foreach(timeDfs.run)
     var sccs: List[List[T]] = Nil
     var curScc: List[T]     = Nil
     var sccDfs              = DFS(graph, node => curScc :+= node)
@@ -50,7 +50,7 @@ class DFS[T](
       return
     visited += v
     onEnter(v)
-    for u <- graph(v) do run(u)
+    graph(v).foreach(run)
     onExit(v)
 
 def reverseGraph[T](g: Graph[T]): Graph[T] =
