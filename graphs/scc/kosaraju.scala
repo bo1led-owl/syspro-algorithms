@@ -14,10 +14,15 @@ def parseFunctions(lines: IterableOnce[String]): Graph[String] =
 @main def main() =
   val fns = parseFunctions(Source.stdin.getLines())
   println("SCCs:")
-  Kosaraju(fns).run.foreach(scc => println(s"  ${scc.mkString(", ")}"))
+  val sccs = Kosaraju(fns).run
+  for scc <- sccs do println(s" - ${scc.mkString(", ")}")
 
-  var recursiveFunctions = HashSet[String]()
-  for fn <- fns.keys do DFS(fns, _ => (), _ => (), recursiveFunctions += _).run(fn)
+  val recursiveFunctions = {
+    val (singleNodeSccs, multipleNodeSccs) = sccs.partition(_.length == 1)
+    singleNodeSccs.flatten.filter(fn => fns(fn).contains(fn))
+      ++ multipleNodeSccs.flatten
+  }.distinct.sorted
+
   println(s"recursive functions: ${recursiveFunctions.mkString(", ")}")
 
 class Kosaraju[T](graph: Graph[T], revgraph: Graph[T]):
@@ -25,12 +30,17 @@ class Kosaraju[T](graph: Graph[T], revgraph: Graph[T]):
   private var maxTime: Int          = 0
   def this(g: Graph[T]) = this(g, reverseGraph(g))
   def run: List[List[T]] =
-    var timeDfs = DFS[T](revgraph, _ => (), node => { time += (node, maxTime); maxTime += 1 })
+    var timeDfs = DFS[T](
+      revgraph,
+      onExit = node => {
+        time += (node, maxTime); maxTime += 1
+      },
+    )
     revgraph.keys.foreach(timeDfs.run)
     var sccs: List[List[T]] = Nil
     var curScc: List[T]     = Nil
-    var sccDfs              = DFS(graph, node => curScc :+= node)
-    for v <- graph.keys.toList.sortBy(time(_)).reverse do
+    var sccDfs              = DFS(graph, onEnter = node => curScc :+= node)
+    for v <- graph.keys.toList.filter(time.contains).sortBy(time).reverse do
       curScc = Nil
       sccDfs.run(v)
       if !curScc.isEmpty then sccs :+= curScc
@@ -40,14 +50,11 @@ class DFS[T](
     graph: Graph[T],
     onEnter: T => Unit = (_: T) => (),
     onExit: T => Unit = (_: T) => (),
-    onLoop: T => Unit = (_: T) => ()
 ):
   private var visited: HashSet[T] = HashSet()
   def run(v: T): Unit =
     if !graph.contains(v) then return
-    if visited.contains(v) then
-      onLoop(v)
-      return
+    if visited.contains(v) then return
     visited += v
     onEnter(v)
     graph(v).foreach(run)

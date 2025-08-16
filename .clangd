@@ -1,5 +1,5 @@
 CompileFlags:
-  Add: [-Wall, -Wextra]
+  Add: [-Wall, -Wextra, -Wcovered-switch-default]
 
 ---
 
