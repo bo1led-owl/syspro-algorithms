@@ -3,7 +3,7 @@ import scala.collection.mutable.HashMap
 import scala.util.boundary
 import scala.util.boundary.break
 
-// https://leetcode.com/problems/redundant-connection-ii/submissions/1771743728/
+// https://leetcode.com/problems/redundant-connection-ii/submissions/1777965286/
 
 extension [A](o: Option[A]) infix def ifNone(f: => Unit): Option[A] = o.orElse({ f; None })
 
@@ -14,7 +14,7 @@ def findEdgesPointingToTheSameNode(edges: IterableOnce[Edge]): Option[(Edge, Edg
 
 def solution(edges: Iterable[Edge]): Edge =
   val candidates = findEdgesPointingToTheSameNode(edges)
-  val unionFind  = UnionFind[Int]()
+  val unionFind  = UnionFind(edges.iterator.map(e => e.from max e.to).max)
 
   def isSecondCandidate(edge: Edge): Boolean = candidates exists (_._2 == edge)
   boundary:
@@ -30,11 +30,11 @@ def solution(edges: Iterable[Edge]): Edge =
 case class Edge(from: Int, to: Int):
   def toArray: Array[Int] = Array(from, to)
 
-class UnionFind[A] extends PartialFunction[A, A] {
-  private val parents: HashMap[A, A] = HashMap()
-  private val ranks: HashMap[A, Int] = HashMap()
+class UnionFind private (val parents: Array[Int], val ranks: Array[Int])
+    extends PartialFunction[Int, Int] {
+  def this(n: Int) = this(Array.fill(n + 1)(-1), Array.fill(n + 1)(0))
 
-  def apply(item: A): A =
+  def apply(item: Int): Int =
     val parent = parents(item)
     if parent != item then
       val set = this(parent)
@@ -42,23 +42,32 @@ class UnionFind[A] extends PartialFunction[A, A] {
       set
     else item
 
-  override def isDefinedAt(x: A): Boolean = parents contains x
+  override def isDefinedAt(x: Int): Boolean = parents(x) != -1
 
-  def insert(item: A): A =
-    if !(parents contains item) then
-      parents += item -> item
-      ranks += item   -> 0
-    item
+  def insert(item: Int): Unit = {
+    if isDefinedAt(item) then return
 
-  def findOrInsert(item: A): A = this lift item getOrElse insert(item)
+    parents.update(item, item)
+    ranks.update(item, 0)
+  }
 
-  infix def union(a: A, b: A): Unit =
-    val aClass -> bClass = findOrInsert(a) -> findOrInsert(b)
-    val aRank -> bRank   = ranks(aClass)   -> ranks(bClass)
+  def findOrInsert(item: Int): Int =
+    this lift item getOrElse {
+      insert(item)
+      item
+    }
+
+  infix def union(a: Int, b: Int): Unit = {
+    val aClass = findOrInsert(a)
+    val bClass = findOrInsert(b)
+
+    val aRank = ranks(aClass)
+    val bRank = ranks(bClass)
     if aRank > bRank then parents.update(bClass, aClass)
     else
       parents.update(aClass, bClass)
       if aRank == bRank then ranks.update(bClass, bRank + 1)
+  }
 }
 
 object Solution:

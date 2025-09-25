@@ -14,7 +14,7 @@ import scala.util.matching.Regex
   var totalWeight  = 0
   val visited      = HashSet[Int]()
 
-  Iterator range (0, n) filterNot (visited contains _) map (graph.prims) foreach
+  Iterator range (0, n) filterNot visited map (graph.prims) foreach
     { (newVisited, newWeight) =>
       accessPoints += 1
       visited ++= newVisited
@@ -39,7 +39,7 @@ class Graph(repr: Array[ArrayBuffer[Edge]]) {
 
     val heap = PriorityQueue from repr(start).iterator
 
-    def notVisitedEdge(e: Edge) = !(visited contains e.dest)
+    def notVisitedEdge(e: Edge) = !visited(e.dest)
     def getNext: Option[Edge]   = heap dequeueUntil notVisitedEdge
 
     Iterator continually getNext takeWhile (_.isDefined) map (_.get.unapply) foreach
