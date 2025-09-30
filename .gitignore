@@ -1,10 +1,12 @@
 .cache/
 classroom/
 .bsp/
+.bloop/
 .scala-build/
 .metals/
-*/build/
-*/dist-newstyle/
+target/
+build/
+dist-newstyle/
 *.aux
 *.log
-*/target/
+target/
