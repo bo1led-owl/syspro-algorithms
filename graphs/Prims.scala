@@ -1,6 +1,5 @@
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.HashSet
-import scala.collection.mutable.PriorityQueue
 
 import scala.util.matching.Regex
 
@@ -34,19 +33,17 @@ class Graph(repr: Array[ArrayBuffer[Edge]]) {
     repr(to) += Edge(from, weight)
 
   def prims(start: Int): (HashSet[Int], Int) = {
-    val visited     = HashSet(start)
-    var totalWeight = 0
-
-    val heap = PriorityQueue from repr(start).iterator
-
+    val visited                 = HashSet(start)
     def notVisitedEdge(e: Edge) = !visited(e.dest)
-    def getNext: Option[Edge]   = heap dequeueUntil notVisitedEdge
+    var totalWeight             = 0
 
-    Iterator continually getNext takeWhile (_.isDefined) map (_.get.unapply) foreach
-      { (cur, weight) =>
+    val heap = BinomialHeap.from(repr(start))(using mapper = _.dest)
+
+    Iterator continually (heap.dequeue) takeWhile (_.isDefined) map (_.get) foreach
+      { case Edge(cur, weight) =>
         visited += cur
         totalWeight += weight
-        heap ++= repr(cur).iterator filter notVisitedEdge
+        repr(cur) filter notVisitedEdge foreach heap.decreaseElement
       }
 
     visited -> totalWeight
@@ -54,16 +51,11 @@ class Graph(repr: Array[ArrayBuffer[Edge]]) {
 }
 
 case class Edge(dest: Int, weight: Int) extends Ordered[Edge]:
-  override infix def compare(that: Edge): Int = that.weight compare weight
+  override infix def compare(that: Edge): Int = weight compare that.weight
   def unapply: (Int, Int)                     = dest -> weight
 
 given Ordering[Edge] with
   infix def compare(x: Edge, y: Edge): Int = x compare y
-
-extension [T](q: PriorityQueue[T])
-  infix def dequeueUntil(p: T => Boolean): Option[T] =
-    if q.isEmpty then None
-    else Some(q.dequeue) filter p orElse (q dequeueUntil p)
 
 def parseHeader(line: String): (Int, Int) =
   line.trim match
