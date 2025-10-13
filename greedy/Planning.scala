@@ -77,7 +77,6 @@ class UnionFind private (
     if parent != item then
       val set = this(parent)
       parents.update(item, set)
-      lefts.update(item, lefts(set))
       set
     else item
 
