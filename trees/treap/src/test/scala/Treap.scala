@@ -56,9 +56,7 @@ class TreapSuite extends munit.FunSuite {
   }
 
   test("insert") {
-    val items = ArrayBuffer(1, 4, 5)
-
-    var t = Treap.from[Int](items)(using rand = Random())
+    var t = Treap(1, 4, 5)(using rand = Random())
 
     t = t.insert(1, 2);
     assertEquals(t.accumulated, 12)

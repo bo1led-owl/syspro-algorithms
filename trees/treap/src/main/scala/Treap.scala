@@ -9,6 +9,7 @@ trait Monoid[A] extends Semigroup[A]:
 
 object Treap {
   def apply[A](x: A)(using rand: Random, m: Monoid[A]): Treap[A] = Node(x)
+  def apply[A](items: A*)(using rand: Random, m: Monoid[A]): Treap[A] = from(items)
   def empty[A](using rand: Random, m: Monoid[A]): Treap[A]       = Empty()
   def from[A](items: IterableOnce[A])(using rand: Random, m: Monoid[A]): Treap[A] =
     items.iterator.foldLeft(empty[A]) { _ + _ }
