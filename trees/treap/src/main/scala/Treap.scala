@@ -1,5 +1,4 @@
 import scala.util.Random
-import java.awt.Image
 
 trait Semigroup[A]:
   def add(a: A, b: A): A
