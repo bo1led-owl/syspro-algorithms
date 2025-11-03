@@ -1,5 +1,3 @@
-import scala.collection.Seq
-
 trait Semigroup[A] {
   def add(x: A)(y: A): A
 }
