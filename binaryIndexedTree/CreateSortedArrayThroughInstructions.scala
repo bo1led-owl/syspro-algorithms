@@ -1,9 +1,9 @@
 trait Semigroup[A] {
-  def add(x: A)(y: A): A
+  def add(x: A, y: A): A
 }
 
 implicit class SemigroupOps[A](l: A) {
-  infix def add(r: A)(using ev: Semigroup[A]): A = ev.add(l)(r)
+  infix def add(r: A)(using ev: Semigroup[A]): A = ev.add(l, r)
 }
 
 trait Monoid[A] extends Semigroup[A] {
@@ -11,10 +11,12 @@ trait Monoid[A] extends Semigroup[A] {
 }
 
 trait Group[A] extends Monoid[A] {
-  def sub(x: A)(y: A): A
+  def inverse(x: A): A
+  def sub(x: A, y: A): A = add(x, inverse(y))
 }
 
 implicit class GroupOps[A](l: A) {
+  def inverse(using ev: Group[A]): A = ev.inverse(l)
   infix def sub(r: A)(using ev: Group[A]): A = ev.sub(l)(r)
 }
 
