@@ -2,8 +2,8 @@ trait Semigroup[A] {
   def add(x: A, y: A): A
 }
 
-implicit class SemigroupOps[A](l: A) {
-  infix def add(r: A)(using ev: Semigroup[A]): A = ev.add(l, r)
+implicit class SemigroupOps[A](l: A)(using ev: Semigroup[A]) {
+  infix def add(r: A): A = ev.add(l, r)
 }
 
 trait Monoid[A] extends Semigroup[A] {
@@ -12,17 +12,20 @@ trait Monoid[A] extends Semigroup[A] {
 
 trait Group[A] extends Monoid[A] {
   def inverse(x: A): A
-  def sub(x: A, y: A): A = add(x, inverse(y))
+  def sub(x: A, y: A): A = x add inverse(y)
 }
 
-implicit class GroupOps[A](l: A) {
-  def inverse(using ev: Group[A]): A = ev.inverse(l)
-  infix def sub(r: A)(using ev: Group[A]): A = ev.sub(l)(r)
+extension [A](l: A)(using ev: Group[A]) {
+  def inverse: A         = ev.inverse(l)
+  infix def sub(r: A): A = ev.sub(l, r)
 }
 
-given intAdditionGroup: Group[Int] with
-  def add(x: Int)(y: Int): Int = x + y
-  def sub(x: Int)(y: Int): Int = x - y
+trait AbelianGroup[A] extends Group[A]
+
+given intAdditionGroup: AbelianGroup[Int] with
+  def add(x: Int, y: Int): Int = x + y
+  def inverse(x: Int): Int     = -x
+  def sub(x: Int, y: Int): Int = x - y
   def zero: Int                = 0
 
 class BinaryIndexedTree[A: scala.reflect.ClassTag] private (repr: Array[A])(using ev: Group[A]) {

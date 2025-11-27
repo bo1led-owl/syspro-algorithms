@@ -1,10 +1,12 @@
-BasedOnStyle: Google
-ColumnLimit: 100
+BasedOnStyle: LLVM
+ColumnLimit: 80
 IndentWidth: 4
 AccessModifierOffset: -4
-AllowShortBlocksOnASingleLine: Always
-AllowShortEnumsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: Always
-AllowShortLoopsOnASingleLine: false
+InsertBraces: true
 DerivePointerAlignment: false
 PointerAlignment: Left
+# AllowShortBlocksOnASingleLine: Empty
+# AllowShortFunctionsOnASingleLine: All
+# AllowShortEnumsOnASingleLine: false
+# AllowShortIfStatementsOnASingleLine: Never
+# AllowShortLoopsOnASingleLine: false
