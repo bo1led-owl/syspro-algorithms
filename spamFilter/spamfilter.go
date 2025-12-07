@@ -53,7 +53,6 @@ func (sf *SpamFilter) AddTrigger(trigger string) {
 
 type Result struct {
 	Indices      map[string]([]int)
-	Matches      map[string]int
 	TotalMatches int
 }
 
@@ -63,7 +62,6 @@ func (sf *SpamFilter) Check(text string) Result {
 	}
 
 	indices := make(map[string]([]int))
-	matches := make(map[string]int)
 	total := 0
 
 	curNode := sf.trieRoot
@@ -75,7 +73,6 @@ func (sf *SpamFilter) Check(text string) Result {
 			trigger := suffixBacktrackNode.TerminalFor
 			if trigger != nil {
 				indices[*trigger] = append(indices[*trigger], i-len(*trigger))
-				matches[*trigger] += 1
 				total += 1
 			}
 
@@ -85,7 +82,7 @@ func (sf *SpamFilter) Check(text string) Result {
 		curNode = sf.next(curNode, c)
 	}
 
-	return Result{indices, matches, total}
+	return Result{indices, total}
 }
 
 func (sf *SpamFilter) suf(v *trieNode) *trieNode {

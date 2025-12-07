@@ -31,16 +31,6 @@ func checkResult(t *testing.T, iteration int, text string, trigger string, res s
 		)
 	}
 
-	if res.Matches[trigger] != len(occ) {
-		t.Errorf(
-			"%d `%s`: occurence count mismatch: expected %v, got %v",
-			iteration,
-			trigger,
-			len(occ),
-			res.Matches[trigger],
-		)
-	}
-
 	return len(occ)
 }
 
